@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:9 # Use the MysQL 9 image
+    environment:
+      MYSQL_DATABASE: demodb # Set the database name
+      MYSQL_USER: demouser # Set the MySQL user
+      MYSQL_PASSWORD: demopwd # Set the MySQL user password
+      MYSQL_ROOT_PASSWORD: demorpwd # Set the MySQL root password
+    ports:
+      - "3306:3306" # Map port 3306 on the host to port 3306 in the container
+    volumes:
+      - db_data:/var/lib/mysql # Persist MySQL data in a named volume
+
+  web:
+    build: . # build the Docker image using Dockerfile
+    ports:
+      - "8000:8000" # Map port 8000 on the host to port 8000 in the container
+
+    depends_on:
+      - db # Ensure the db services starts before the web service
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: mysql://<database_user>:<password>@db:3306/<database_name>
+      DB_NAME: demodb
+      DB_USER: demouser
+      DB_PASSWORD: demopwd
+      DB_HOST: db # i.e. db in this case
+      DB_PORT: 3306
+
+# Define named volumes
+volumes:
+  db_data:
